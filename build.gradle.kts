@@ -13,7 +13,7 @@ plugins {
 
 group = "com.chhnangf"
 version = "0.0.1"
-
+val ktorVersion = "3.0.0-beta-1"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 
@@ -46,4 +46,6 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+
 }

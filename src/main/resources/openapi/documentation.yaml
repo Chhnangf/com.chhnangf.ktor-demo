@@ -18,6 +18,6 @@ paths:
                 type: "string"
               examples:
                 Example#1:
-                  value: "Hello World!"
+                  value: "Hello Ktor!"
 components:
   schemas: {}

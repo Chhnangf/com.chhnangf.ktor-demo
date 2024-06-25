@@ -1,0 +1,15 @@
+GET 127.0.0.1:8080/serialTasks
+Accept: application/json
+
+### Send POST request with json body
+POST 127.0.0.1:8080/serialTasks
+Content-Type: application/json
+
+{
+  "name": "post",
+  "description": "Post a json",
+  "priority": "Medium"
+}
+
+### Send DELETE request with routing
+DELETE 127.0.0.1:8080/delete
