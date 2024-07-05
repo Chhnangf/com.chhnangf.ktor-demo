@@ -6,9 +6,12 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import java.time.Duration
+import io.ktor.serialization.kotlinx.*
+import kotlinx.serialization.json.*
 
 fun Application.configureSockets() {
     install(WebSockets) {
+        contentConverter = KotlinxWebsocketSerializationConverter(Json)
         pingPeriod = Duration.ofSeconds(15)
         timeout = Duration.ofSeconds(15)
         maxFrameSize = Long.MAX_VALUE
