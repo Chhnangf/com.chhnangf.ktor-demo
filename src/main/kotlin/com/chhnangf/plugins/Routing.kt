@@ -1,5 +1,6 @@
 package com.chhnangf.plugins
 
+import com.chhnangf.func.saveByteArrayAsFile
 import com.chhnangf.model.*
 import io.ktor.http.*
 import io.ktor.http.ContentDisposition.Companion.File
@@ -15,6 +16,7 @@ import kotlinx.css.input
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.UUID
 import kotlin.io.path.Path
 import kotlin.io.use
 
@@ -30,31 +32,34 @@ fun Application.configureRouting() {
         }
         get("/tasks") {
             call.respondText(
-                contentType = ContentType.parse("text/html"),
-                text = tasks.tasksAsTable()
+                contentType = ContentType.parse("text/html"), text = tasks.tasksAsTable()
             )
 
         }
         staticResources("static", "static")
         get("/serialTasks") {
             val tasks = SerialTaskRepository.allTasks()
-            call.respond(HttpStatusCode.OK,tasks)
+            call.respond(HttpStatusCode.OK, tasks)
         }
-        post("/serialTasks"){
+        post("/serialTasks") {
             // 从请求中获取 body，反序列化为 PhotoObject 或 List<PhotoObject>
             val tasks = call.receive<List<PhotoObject>>()
             println("call.receive<List<PhotoObject>>() -> $tasks")
             // 调用存储逻辑，保存PhotoObject
             SerialTaskRepository.addListTask(tasks)
             // 响应成功状态
-            call.respond(HttpStatusCode.Created,SerialTaskRepository.allTasks())
+            call.respond(HttpStatusCode.Created, SerialTaskRepository.allTasks())
 
         }
 
         post("/upload") {
-            // 接收多部分表单数据
             val multipartData = call.receive<MultiPartData>()
             println("server -> /upload $multipartData")
+
+            // 在处理 multipart 请求的地方
+            var postTitle = ""
+            var postDescription  = ""
+            val filenamesList = mutableListOf<String>() // 初始化一个列表来存储文件名
 
             // 遍历多部分数据中的每个部分
             multipartData.forEachPart { part ->
@@ -63,32 +68,34 @@ fun Application.configureRouting() {
                     is PartData.FormItem -> {
                         // 处理文本表单字段
                         println("Received form field: ${part.name} with value: ${part.value}")
+                        if (part.name == "title") { postTitle = part.value }
+                        if (part.name == "description") { postDescription = part.value }
                     }
-                    is PartData.FileItem -> {
-                        println("Received file part: ${part.name}")
-                        println("Data type: FileItem")
-                        println("Filename: ${part.name}")
-                        // 获取原始的 ByteReadChannel 并读取数据
-//                        val originalStream = part.provider()
-//                        // 将上传的文件保存到服务器上的指定路径
-//                        val fileToSave = File("/path/to/save/${part.name}")
-//                        println("originalStream: $originalStream, fileToSave: $fileToSave")
 
+                    is PartData.FileItem -> {
+                        println("Received file part: name: ${part.name}, originalFileName: ${part.originalFileName}")
+                        println("Data type: FileItem")
                         val byteReadChannel = part.provider()
                         val bytePacket = byteReadChannel.readRemaining()
                         val byteArray = bytePacket.readBytes()
                         println("byte array: $byteArray")
 
                         // save File
-                        part.originalFileName?.let { Paths.get(it) }?.let { Files.write(it, byteArray) }
-                        call.respondBytes(
-                            bytes = byteArray,
-                            contentType = ContentType.Image.JPEG, // 设置内容类型为 JPEG 图像
-                            status = HttpStatusCode.OK // 设置状态码为 OK
-                        ) {
-                            println("call.respondBytes -> ${byteArray.size}")
-                        }
+                        val filename = "${UUID.randomUUID()}.jpg"
+                        println(filename)
+                        saveByteArrayAsFile(filename, byteArray)
+
+                        // 将文件名添加到列表中
+                        filenamesList.add(filename)
+//                        call.respondBytes(
+//                            bytes = byteArray,
+//                            contentType = ContentType.Image.JPEG, // 设置内容类型为 JPEG 图像
+//                            status = HttpStatusCode.OK // 设置状态码为 OK
+//                        ) {
+//                            println("call.respondBytes -> ${byteArray.size}")
+//                        }
                     }
+
                     is PartData.BinaryChannelItem -> {
                         // 处理二进制通道数据
                         println("Received binary channel part")
@@ -96,6 +103,7 @@ fun Application.configureRouting() {
                         // TODO: 处理二进制通道数据
 
                     }
+
                     is PartData.BinaryItem -> {
                         // 处理二进制数据
                         println("Received binary item")
@@ -106,8 +114,7 @@ fun Application.configureRouting() {
                         val inputLength = part.provider().remaining
 
                         call.respondBytes(
-                            bytes = input.readBytes(),
-                            contentType = ContentType.Image.JPEG, // 设置内容类型为 JPEG 图像
+                            bytes = input.readBytes(), contentType = ContentType.Image.JPEG, // 设置内容类型为 JPEG 图像
                             status = HttpStatusCode.OK // 设置状态码为 OK
                         ) {
                             println("call.respondBytes -> ${input.readBytes().size}")
@@ -116,9 +123,19 @@ fun Application.configureRouting() {
                     }
                 }
             }
-
+            // 使用收集到的文件名列表创建 Post 对象
+            val post = PostPostObject(postTitle, postDescription, filenamesList)
+            filenamesList.forEachIndexed { index, string ->
+                println("index: $index, string: $string")
+            }
+            call.respond(HttpStatusCode.OK, listOf(post))
+            // 现在 post 对象包含了所有上传的图片文件名
             // 构造响应并发送回客户端
-            call.respondText("Data received successfully!", status = HttpStatusCode.OK)
+            //call.respondText("Data received successfully!", status = HttpStatusCode.OK)
+        }
+        get("/file") {
+            val file = File("93b9ac2e-8e29-4353-b521-f91ea5abe7c2.jpg")
+            call.respondFile(file)
         }
         /**
          *  http://127.0.0.1:9292/byName/learn
@@ -186,8 +203,6 @@ fun Application.configureRouting() {
 //            }
         }
     }
-
-
 
 
 }
