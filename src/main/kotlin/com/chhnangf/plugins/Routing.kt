@@ -81,19 +81,12 @@ fun Application.configureRouting() {
                         println("byte array: $byteArray")
 
                         // save File
-                        val filename = "${UUID.randomUUID()}.jpg"
-                        println(filename)
-                        saveByteArrayAsFile(filename, byteArray)
+                        val directoryPath = "./uploads" // 指定目录路径
+                        val filename = "${UUID.randomUUID()}.jpg" // 生成唯一的文件名
+                        saveByteArrayAsFile(directoryPath, filename, byteArray)
 
                         // 将文件名添加到列表中
                         filenamesList.add(filename)
-//                        call.respondBytes(
-//                            bytes = byteArray,
-//                            contentType = ContentType.Image.JPEG, // 设置内容类型为 JPEG 图像
-//                            status = HttpStatusCode.OK // 设置状态码为 OK
-//                        ) {
-//                            println("call.respondBytes -> ${byteArray.size}")
-//                        }
                     }
 
                     is PartData.BinaryChannelItem -> {
@@ -126,81 +119,37 @@ fun Application.configureRouting() {
             // 使用收集到的文件名列表创建 Post 对象
             val post = PostPostObject(postTitle, postDescription, filenamesList)
             filenamesList.forEachIndexed { index, string ->
-                println("index: $index, string: $string")
+                println("filenamesList -> index: $index, string: $string")
             }
             call.respond(HttpStatusCode.OK, listOf(post))
-            // 现在 post 对象包含了所有上传的图片文件名
-            // 构造响应并发送回客户端
-            //call.respondText("Data received successfully!", status = HttpStatusCode.OK)
         }
         get("/file") {
             val file = File("93b9ac2e-8e29-4353-b521-f91ea5abe7c2.jpg")
             call.respondFile(file)
         }
-        /**
-         *  http://127.0.0.1:9292/byName/learn
-         *  http://127.0.0.1:9292/byName/project
-         *  http://127.0.0.1:9292/byName/data
-         */
-//        get("/byName/{taskName}") {
-//            val name = call.parameters["taskName"]
-//            if (name == null) {
-//                call.respond(HttpStatusCode.BadRequest)
-//                return@get
-//            }
-//
-//            val serialTask = SerialTaskRepository.taskByName(name)
-//            if (serialTask == null) {
-//                call.respond(HttpStatusCode.BadRequest)
-//                return@get
-//            }
-//            call.respond(serialTask)
-//        }
-//        get("/byPriority/{taskPriority}") {
-//            val priorityAsText = call.parameters["taskPriority"]
-//            if (priorityAsText == null) {
-//                call.respond(HttpStatusCode.BadRequest)
-//                return@get
-//            }
-//            try {
-//                val priority = Priority.valueOf(priorityAsText)
-//                val serialTask = SerialTaskRepository.tasksByPriority(priority)
-//                if (serialTask.isEmpty()) {
-//                    call.respond(HttpStatusCode.BadRequest)
-//                    return@get
-//                }
-//                call.respond(serialTask)
-//            } catch (e: Exception) {
-//                call.respond(HttpStatusCode.BadRequest)
-//            }
-//        }
+
+        get("/uploads/{filename}") {
+            // 从路径参数中获取文件名
+            val filename = call.parameters["filename"]!!
+
+            // 指定读取文件的存储目录
+            val uploadDirection = File("./uploads")
+
+            // 构造文件的完整路径
+            val file = File(uploadDirection,filename)
+
+            // 检查文件是否存在
+            if (file.exists() && file.isFile) {
+                // 如果文件存在，读取并返回文件内容
+                call.respondFile(file)
+            } else {
+                // 如果文件不存在，返回404状态码
+                call.respond(HttpStatusCode.NotFound)
+            }
+
+        }
 
         route("serialTasks") {
-            // post add the SerialTask
-//            post {
-//                try {
-//                    val serialTask = call.receive<SerialTask>()
-//                    SerialTaskRepository.addTask(serialTask)
-//                    call.respond(HttpStatusCode.NoContent)
-//                } catch (e: IllegalArgumentException) {
-//                    call.respond(HttpStatusCode.BadRequest)
-//                } catch (e: JsonConvertException) {
-//                    call.respond(HttpStatusCode.BadRequest)
-//                }
-//            }
-
-//            delete("/{taskName}") {
-//                val name = call.parameters["taskName"]
-//                if (name == null) {
-//                    call.respond(HttpStatusCode.BadRequest)
-//                    return@delete
-//                }
-//                if (SerialTaskRepository.removeTask(name)) {
-//                    call.respond(HttpStatusCode.NoContent)
-//                } else {
-//                    call.respond(HttpStatusCode.NoContent)
-//                }
-//            }
         }
     }
 
