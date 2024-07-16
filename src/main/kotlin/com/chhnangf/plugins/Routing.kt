@@ -1,5 +1,6 @@
 package com.chhnangf.plugins
 
+import com.chhnangf.func.IdGenerator
 import com.chhnangf.func.saveByteArrayAsFile
 import com.chhnangf.model.*
 import io.ktor.http.*
@@ -117,10 +118,12 @@ fun Application.configureRouting() {
                 }
             }
             // 使用收集到的文件名列表创建 Post 对象
-            val post = PostPostObject(postTitle, postDescription, filenamesList)
+            val idGenerator = IdGenerator().getNextId()
+            val post = PostPostObject(idGenerator,postTitle, postDescription, filenamesList)
             filenamesList.forEachIndexed { index, string ->
                 println("filenamesList -> index: $index, string: $string")
             }
+            println("post onject -> $post")
             call.respond(HttpStatusCode.OK, listOf(post))
         }
         get("/file") {

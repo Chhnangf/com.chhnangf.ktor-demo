@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PostPostObject (
     // 没有数据库，临时屏蔽id，内容设置可空
-    //val id:Int,
+    val id:Int,
     val title:String?,
     val content:String?,
     val imageUrl:List<String?>,
