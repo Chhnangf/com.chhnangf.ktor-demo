@@ -1,6 +1,7 @@
 package com.chhnangf
 
 import com.chhnangf.plugins.*
+import com.chhnangf.user.configureUserWithJwt
 import io.ktor.server.application.*
 import java.util.logging.Logger
 
@@ -15,4 +16,5 @@ fun Application.module() {
     configureTemplating()
     configureHTTP()
     configureRouting()
+    configureUserWithJwt()
 }

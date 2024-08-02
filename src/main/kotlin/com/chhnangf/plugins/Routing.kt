@@ -15,21 +15,57 @@ import io.ktor.server.routing.*
 import io.ktor.utils.io.core.*
 import kotlinx.css.input
 import java.io.File
+import java.io.FileNotFoundException
+import java.nio.charset.Charset
+import java.nio.charset.Charset.forName
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.UUID
+import java.util.regex.Pattern
 import kotlin.io.path.Path
 import kotlin.io.use
 
 fun Application.configureRouting() {
     routing {
+        staticResources("/.well-known", "certs")
+
         get("/") {
             call.respondText("Hello World!")
         }
-        get("/test1") {
-            val text = "<h1> Hello From Ktor </h1>"
-            val type = ContentType.parse("text/html")
-            call.respondText(text, contentType = type)
+        get("/searchKeyword/") {
+            val pathParam = call.parameters["path"] // 从URL参数中获取文件路径
+            val keywordParam = call.parameters["keyword"] // 从URL参数中获取关键词
+            if (pathParam == null || keywordParam == null) {
+                call.respond(HttpStatusCode.BadRequest, "Missing path or keyword parameter")
+                return@get
+            }
+
+            val charset = forName("GBK") // 指定GBK编码
+            val type = ContentType.Text.Html // 设置响应的Content-Type
+            val sb = StringBuilder() // 使用StringBuilder来构建HTML内容
+            sb.append("<html><body>") // 添加HTML头部
+
+            val logPath = "h:\\trunk\\client\\logs\\JX3Client_2052-zhcn\\2024_07_31\\JX3Client_2052-zhcn_2024_07_31_14_21_17_12536.log"
+
+            val path = Paths.get(pathParam)
+            val reader = Files.newBufferedReader(path, charset)
+            var found = false // 标记是否找到包含关键词的行
+
+
+            for (line in reader.lines()) { // 使用for循环逐行读取
+                if (line.contains(keywordParam)) {
+                    found = true // 找到包含关键词的行
+                    sb.append("<p>$line</p>") // 将匹配的行添加到StringBuilder中
+                }
+            }
+            reader.close() // 关闭BufferedReader
+
+            if (found) {
+                sb.append("</body></html>") // 如果找到匹配的行，添加HTML尾部并响应
+                call.respondText(sb.toString(), type)
+            } else {
+                call.respondText("""<html><body>No lines contain the keyword "$keywordParam".</body></html>""", type)
+            }
         }
         get("/tasks") {
             call.respondText(
@@ -157,4 +193,14 @@ fun Application.configureRouting() {
     }
 
 
+}
+
+// 确保这个函数在您的项目中的某个地方定义
+fun readFileContent(filePath: String,charset: Charset): String {
+    return try {
+        Files.readAllLines(Paths.get(filePath), charset).joinToString("\n")
+    } catch (e: FileNotFoundException) {
+        // 处理文件未找到的异常，或者抛出异常让调用者处理
+        throw FileNotFoundException("文件未找到: $filePath")
+    }
 }

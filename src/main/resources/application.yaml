@@ -4,3 +4,14 @@ ktor:
             - com.chhnangf.ApplicationKt.module
     deployment:
         port: 8080
+jwt:
+    privateKey: "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCz1REF3x/7mbjMNBjtWq6Xx28un6w97JnJJWylFcZnp4Jjb5NJjm/GvY249H73qsoZmIa295isUmwd7Z5Udw1wTLzCpjKaLeXT+t8tb/lLzjREBwZSEVrqHGw/X2FTbWp8lwbYs/hSNZGJ8R8X9VE7+mLG4iYucoRrOjv3Im+kLzl0S3yXhodnKmsu5cLz2VSJ0M6PaC6tIr3EiMxPBsvHVlIRAF6PurrWLQiyAi+o7D5XoLuqqjje42oBZmpqQdI2n7uc0reAcr++RuAozTOukcFIXn8N/RUknTVSHuIQ66xHzOdzkpNepMQqdCJCg/yTvknGlKEa3dSeYEp++VItAgMBAAECggEALsEzptInD5Qc7sKQxI0yHXYVmwqajpMIPLrFL3qk1ehARzgIFDS7LPG1eiPfKuc1mkgEpmdjQ1I+l91ir9UwIkVhQj5Ro7JRMbbk9XxKVYIsJo+o/gdTGtD+988Fj9o/uFrPxeGsqzsQNswA6Iq4bx6fNdQwVx0g/nvqgUtruUS6WmP0HherIvWL+BXkwvU+HEVVbg5hsTrSzQ8gxlMwZfnspk2bM3NZpd42HmtxhVbWXTQ8xojdJbh2Ka7t5+sWb2kUj/uRg8qMLhDzDhbQmtQ8zTNmoYTt/Hr04VbdUSAIR1u8FiWrG06MMy+tuw/D1so/bXI5XalAQbEvi8/D5QKBgQDWneePP4TBkTKAO3jCW8hsr2Q0MKZATTu7iO3k/2Od1YHwJOLdSvpPKDJ2UpMlmU/T6dwHwvVtNigWraNIRbkNcSLj2GETCryDk41GUocA7ynP/yYpxqrDsWo9k2Jy0xZyVc974cy0ffewXXfdKNF7xM4TRNTG83UPuJxkbbXJnwKBgQDWghleXw563q/zwrvh6p/zmDSJXyqBI2vtwaNwnKNGFhfz4WoAW9X2zUbSEQsRcPLLk12ECnpe373le2FNCh8cr71bmuolMreh+kywAys/x3YhjXzYwgg138ftx4tPYAIRZ1hPlLD7oncltrid0rb7XmO7Xy8BUvxTFsDFIlOoswKBgQCb6e0+oRuV8CDrDcmGEV3Cr4yxaaJt1m4NqMWC9pJtKJ4UUwfJUl4UQZSfZw/lYcKfpiamMNlRtOVczFpx980fWdDKC/lB9yvKvtgEfZH8eMM8ixUzhlOqhWo0P61m07lb6MEqM3kequDVbKHWtn+xVeGMGBYoTtf9StW7FATb6wKBgHP3/A0YKPTmhYusgPTfasBATk7iQ1Fzu/rbEChmlqLieOqhuDQfciquyhXxnuE8BhdnQUyMeaHnJnv1WyJSUYWpwR7QPrwDkmGgt2sFG5GsnUIAgzmQlO3DYQw9MCSmjBeqnoTPp2szZ2TdRywT6lc1rYd0Ky51FfM5vtgU+dOfAoGBAJ8j5Nxa5+fUxb82DUQ8JpLgu+crWcqQX1RyQy5weBs6l/5jJLfnSmYWt3lMG4lzs+F3C7fatPrTHOM3I53BiJ0CQJ3TsM9VYxNnpgn8LohRy3X/N6n/vpgrkQBcRT0u/BWuAlODaPgmRsvPmV3tDasLRFIqLUN75hVfdemsHdcv"
+    issuer: "http://0.0.0.0:8080/"
+    audience: "http://0.0.0.0:8080/login"
+    realm: "MyProject"
+database:
+    url: "jdbc:mysql://localhost:3306/app_next"
+    user: "root"
+    password: "root"
+#    password: "Fqy1057970659_"
+
